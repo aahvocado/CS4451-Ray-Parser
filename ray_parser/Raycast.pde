@@ -5,12 +5,57 @@ class Ray{
   PVector origin;
   PVector direction;
   float fov;
+  
   Ray(PVector originParam, PVector directionParam, float fovParam){
     origin = originParam;
     direction = directionParam;
     fov = fovParam;
+  }  
+  
+  PVector instersections(ArrayList objects){
+    PVector surfaceColor = new PVector(0,0,0);
+    
+    for(int i =0;i<objects.size();i++){
+      if(objects.get(i) instanceof Sphere){
+        float t = 10000;
+        Sphere s = (Sphere)objects.get(i);
+        surfaceColor = s.rayIntersects(this, t);
+        
+      }
+    }
+    return surfaceColor;
   }
 }
+
+/*
+ArrayList spheresIntersected;
+ArrayList trianglesIntersected;
+
+
+//takes in a sphere paramter
+PVector sphereTest(Sphere p){
+  PVector surf = new PVector(0,0,0);
+  
+  PVector CO = PVector.sub(origin, direction);
+  PVector rayS = PVector.mult(direction, 2);
+  float A = direction.dot(direction);
+  float B = rayS.dot(CO);
+  float c = (CO.dot(CO)) - sphere.r;
+  
+  float discriminant = sqrt(pow(b, 2) - (4*a*c));
+  if(discriminant > 0){
+    float t0 = (-b + discriminant)/2*a;
+    float t1 = (-b - discriminant)/2*a;
+    surf = p.surface.diffuse;
+    if(t0 < t){
+       t = min(t0, t);
+    }else if(t1<t){
+      t = min(t1, t);
+    }
+  }
+  return surf;
+}*/
+
 
 //things being hit
 class RayHit{

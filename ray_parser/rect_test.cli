@@ -1,8 +1,10 @@
-# this is a file containing test commands for the "irect" program
+# one white triangle
 
 fov 60
 light 0 0 0 1 1 1
-background 0.3 0.3 0.7
+background 0.0 0.5 0.9
 
-write rect.png
+surface  .2 .2 .8  .3 .1 .1  0 0 0  1  0
+sphere  2  0 0 -3
 
+write c0.png

@@ -11,10 +11,10 @@ class Triangle{
   
   //
   PVector getCenter(){
-    PVector cx = (pt1.x + pt2.x + pt3.x)/3;
-    PVector cy = (pt1.y + pt2.y + pt3.y)/3;
-    PVector cz = (pt1.z + pt2.z + pt3.z)/3;
-    return new PVector (cs, cy, cz);
+    float cx = (pt1.x + pt2.x + pt3.x)/3;
+    float cy = (pt1.y + pt2.y + pt3.y)/3;
+    float cz = (pt1.z + pt2.z + pt3.z)/3;
+    return new PVector (cx, cy, cz);
   }
   
 }

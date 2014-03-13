@@ -1,6 +1,38 @@
 //daniel xiao
 //wuz here
 
+
+
+//trace through entire screen
+void raytrace(){
+  float k = tan(fov/2);
+  for(int i = 0; i<width;i++){
+    for(int j = 0; j<height;j++){
+      float xP = ((i - (width/2))*((2*k)/width));
+      float yP = ((j - (height/2))*((2*k)/height));
+      
+      PVector origin = new PVector(0,0,0);
+      PVector direction = new PVector(xP,yP,-1);
+      Ray r = new Ray(origin, direction, fov);
+      
+      PVector getC = r.instersections(objects);
+      //print("\ni: "+i+" j: "+j+" color: " + getC);
+      color c = color(getC.x, getC.y, getC.z);
+      if(!(getC.x == 0 && getC.y == 0 && getC.z == 0)){
+        set(i,j,c);
+      }
+      
+    }
+  }
+}
+
+
+
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////
 //
 // Command Line Interface (CLI) Parser  
@@ -33,7 +65,7 @@ ArrayList lights;//array of light sources
 PVector bgColor;//background color
 
 ArrayList vertices; //arraylist for making a shape
-ArrayList triangles;//all triangles in the scene
+ArrayList objects;//all spheres and triangles in the scene
 Surface currSurr;//current surface
 
 ///////////////////////////////////////////////////////////////////////
@@ -99,7 +131,12 @@ void interpreter() {
       currSurr = new Surface(diffuse, ambient, specular, phong, reflection);
     }    
     else if (token[0].equals("sphere")) {
-      
+      float r = float(token[1]);
+      float x = float(token[2]);
+      float y = float(token[3]);
+      float z = float(token[4]);
+      PVector sPos = new PVector(x,y,z);
+      objects.add(new Sphere(sPos, r, currSurr));
     }
     else if (token[0].equals("begin")) {
       vertices = new ArrayList();//reset vertices
@@ -114,7 +151,7 @@ void interpreter() {
     else if (token[0].equals("end")) {
       if(vertices.size() >= 3){
         Triangle tri = new Triangle((PVector)vertices.get(0), (PVector)vertices.get(1), (PVector)vertices.get(2), currSurr);
-        triangles.add(tri);
+        objects.add(tri);
         vertices = new ArrayList();//reset vertices
       }else{
         print("not enough vertices to make a triangle here");
@@ -135,99 +172,12 @@ void interpreter() {
     }
     else if (token[0].equals("write")) {
       // you should render the scene here
+      raytrace();
       save(token[1]);  
     }
   }
 }
-//trace through entire screen
-void raytrace(){
-  for(int i = 0; i<width;i++){
-    for(int j = 0; j<height;j++){
-      PVector origin = new PVector(0,0,0);
-      PVector direction = new PVector(i,j,-1);
-      RayHit hitData = raycast(origin, direction);
-      
-    }
-  }
-}
-//cast a ray
-RayHit raycast(PVector origin, PVector direction){
-    float x = direction.x;
-    float y = direction.y;
-    Ray castRay = new Ray(origin, direction, fov);
 
-    float k = tan(radians(fov/2));
-    float xp = (x - width/2)*(2*k / width);
-    float yp = (y - height/2)*(2*k / height);
-    
-    Ray ray = castRay;
-    PVector hitPos = P;
-    PVector normal = N;
-    boolean wasHit = true;
-    Surface surface = tri.s;
-    RayHit hitData;
-    
-    //use a triangle's ocation as a point
-    for(int i = 0; i<triangles.size();i++){
-      Triangle thisTri = (Triangle)triangles.get(i);
-      PVector Q = thisTri.getCenter();
-      PVector ttv1 = thisTri.pt1;
-      PVector ttv2 = thisTri.pt2;
-      PVector ttv3 = thisTri.pt3;
-      
-      PVector pA = PVector.sub(ttv2, ttv1);
-      PVector pB = PVector.sub(ttv3,ttv1);
-      PVector N = (pA.cross(pB));
-      
-      PVector QO = PVector.sub(Q, origin);
-      float t = QO.dot(N) / direction.dot(N);    
-
-      
-      //find a triangle that intersects with this intersection,f t intersects
-      if(t!=0){
-        PVector tR = new PVector(t*direction.x, t*direction.y, t*direction.z);
-        PVector P = PVector.add(origin, tR);
-        for(int j = 0; j<triangles.size();j++){
-          Triangle tri = (Triangle)triangles.get(j);
-          
-          PVector v0 = tri.pt1;
-          PVector v1 = tri.pt2;
-          PVector v2 = tri.pt3;
-          //check if within triangle's x
-          PVector edge0 = PVector.sub(v1, v0);
-          PVector edge1 = PVector.sub(v2, v1);
-          PVector edge2 = PVector.sub(v0, v2);
-          
-          PVector c0 = PVector.sub(P, v0);
-          PVector c1 = PVector.sub(P, v1);
-          PVector c2 = PVector.sub(P, v2);
-          
-          PVector ec0 = edge0.cross(c0);
-          PVector ec1 = edge1.cross(c1);
-          PVector ec2 = edge2.cross(c2);
-          
-          if(N.dot(ec0) > 0 && N.dot(ec1) > 0 && N.dot(ec2) > 0){
-            //we did it, it's this triangle
-            hitData = new RayHit(ray, hitPos, normal, wasHit, surface);
-           
-          }
-        }
-      }
-      
-    }
-    
-       return hitData;
-}
-
-
-//draw a pixel on the screen
-void writePixel (int x, int y, PVector rgb) {
-  float r = rgb.x;
-  float g = rgb.y;
-  float b = rgb.z;
-  int index = (height - y - 1) * width + x;
-  pixels[index] = color (r, g, b);
-}
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -241,7 +191,7 @@ void setup() {
   background(0, 0, 0);
   //instantiate arraylists
   lights = new ArrayList();
-  triangles = new ArrayList();
+  objects = new ArrayList();
   
   interpreter();
   
@@ -255,6 +205,5 @@ void setup() {
 ///////////////////////////////////////////////////////////////////////
 void draw() {
 }
-
 
 
