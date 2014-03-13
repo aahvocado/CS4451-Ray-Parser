@@ -1,0 +1,8 @@
+# this is a file containing test commands for the "irect" program
+
+fov 60
+light 0 0 0 1 1 1
+background 0.3 0.3 0.7
+
+write rect.png
+
