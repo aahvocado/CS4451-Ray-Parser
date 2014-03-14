@@ -5,14 +5,19 @@
 
 //trace through entire screen
 void raytrace(){
-  float k = tan(fov/2);
+  print("\nDrawing shape...");
+  
+  float k = tan(radians(fov/2));
   for(int i = 0; i<width;i++){
     for(int j = 0; j<height;j++){
-      float xP = ((i - (width/2))*((2*k)/width));
-      float yP = ((j - (height/2))*((2*k)/height));
+      //float xP = ((i - (width/2))*((2*k)/width));
+      //float yP = ((j - (height/2))*((2*k)/height));
+      float xP = ((2.0*k/width)*i)-k;
+      float yP = ((-2.0*k/height)*j)+k;
+      float vMag = sqrt(pow(xP,2) + pow(yP,2) + 1);
       
       PVector origin = new PVector(0,0,0);
-      PVector direction = new PVector(xP,yP,-1);
+      PVector direction = new PVector(xP/vMag,yP/vMag,-1/vMag);
       Ray r = new Ray(origin, direction, fov);
       
       PVector getC = r.instersections(objects);
@@ -20,8 +25,9 @@ void raytrace(){
       color c = color(getC.x, getC.y, getC.z);
       if(!(getC.x == 0 && getC.y == 0 && getC.z == 0)){
         set(i,j,c);
+      }else{
+        set(i,j, bgColor);
       }
-      
     }
   }
 }
@@ -62,7 +68,7 @@ void keyPressed() {
 
 float fov = 0;//eh
 ArrayList lights;//array of light sources
-PVector bgColor;//background color
+color bgColor;//background color
 
 ArrayList vertices; //arraylist for making a shape
 ArrayList objects;//all spheres and triangles in the scene
@@ -95,7 +101,7 @@ void interpreter() {
       float r = float(token[1]);
       float g = float(token[2]);
       float b = float(token[3]);
-      bgColor = new PVector(r, g, b);
+      bgColor = color(r, g, b);
     }
     else if (token[0].equals("light")) {
       float x = float(token[1]);
@@ -172,8 +178,11 @@ void interpreter() {
     }
     else if (token[0].equals("write")) {
       // you should render the scene here
+          
+  //background(bgColor.x, bgColor.y, bgColor.z);
       raytrace();
       save(token[1]);  
+      reset();
     }
   }
 }
@@ -190,12 +199,15 @@ void setup() {
   colorMode(RGB, 1.0);
   background(0, 0, 0);
   //instantiate arraylists
-  lights = new ArrayList();
-  objects = new ArrayList();
-  
+  reset();
   interpreter();
   
   
+}
+
+void reset(){
+  lights = new ArrayList();
+  objects = new ArrayList();
 }
 
 ///////////////////////////////////////////////////////////////////////

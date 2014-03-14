@@ -12,15 +12,28 @@ class Ray{
     fov = fovParam;
   }  
   
+  //checks if this ray intersects any of the following objects
   PVector instersections(ArrayList objects){
     PVector surfaceColor = new PVector(0,0,0);
-    
+    float t = 10000;
     for(int i =0;i<objects.size();i++){
       if(objects.get(i) instanceof Sphere){
-        float t = 10000;
-        Sphere s = (Sphere)objects.get(i);
-        surfaceColor = s.rayIntersects(this, t);
-        
+        Sphere sph = (Sphere)objects.get(i);
+        if(sph.rayIntersects(this, t)){
+          surfaceColor = sph.s.diffuse;
+        }
+      }else if(objects.get(i) instanceof Triangle){
+        Triangle tri = (Triangle)objects.get(i);
+        PVector planeVector = PVector.sub(tri.getCenter(), origin); 
+        //t = (planeVector.dot(tri.getNormal()) / (direction.dot(tri.getNormal())));
+        if(t > 0){
+          PVector target = PVector.mult(direction, t);
+          float intersectTime = tri.rayIntersects(this); 
+          if(intersectTime>0 && intersectTime<t){
+            t = intersectTime;
+            surfaceColor = tri.s.diffuse;
+          }
+        }
       }
     }
     return surfaceColor;

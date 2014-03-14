@@ -2,9 +2,14 @@
 
 fov 60
 light 0 0 0 1 1 1
-background 0.0 0.5 0.9
+background 0.3 0.3 0.7
 
-surface  .2 .2 .8  .3 .1 .1  0 0 0  1  0
-sphere  2  0 0 -3
+surface   0.8 0.8 0.8   0 0 0   0 0 0   1  0
+
+begin
+vertex  0 -1 -2
+vertex  -1 1 -2
+vertex   1 1 -2
+end
 
 write c0.png

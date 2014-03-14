@@ -11,7 +11,7 @@ class Sphere{
   }
   
   //returns
-  PVector rayIntersects(Ray ray, float t){   
+  boolean rayIntersects(Ray ray, float t){   
     PVector surfaceColor = new PVector(0,0,0);
     PVector CO = PVector.sub(ray.origin, pos);
     PVector rayS = PVector.mult(ray.direction, 2);
@@ -27,6 +27,7 @@ class Sphere{
         if (tTemp < t) {
           surfaceColor = s.diffuse;
           t = min(tTemp, t);
+          return true;
         }
       } else {
         float tf = (-b + discriminant)/2*a;
@@ -34,13 +35,16 @@ class Sphere{
         if (tf < t) {
           surfaceColor = s.diffuse;
           t = min(tf, t);
+          return true;
         }
         if (tn < t) {
           surfaceColor = s.diffuse;
           t = min(tn, t);
+          return true;
         }
       }
     }
-    return surfaceColor;
+    return false;
   }
+  
 }
